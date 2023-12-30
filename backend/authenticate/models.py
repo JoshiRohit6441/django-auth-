@@ -1,6 +1,7 @@
 
 from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, Group, Permission
+import random
 
 
 class MyUserManager(BaseUserManager):
@@ -45,7 +46,7 @@ class User(AbstractBaseUser):
     is_admin = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    # verification_OTP = models.IntegerField(blank=True, null=True)
+    verification_OTP = models.IntegerField(blank=True, null=True)
     groups = models.ManyToManyField(
         'auth.Group',
         verbose_name='groups',
@@ -76,6 +77,12 @@ class User(AbstractBaseUser):
 
     def has_module_perms(self, app_label):
         return True
+
+    def generate_and_save_otp(self):
+        otp = random.randint(100000, 999999)
+        self.verification_OTP = otp
+        self.save()
+        return otp
 
     @property
     def is_staff(self):
