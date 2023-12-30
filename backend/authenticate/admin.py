@@ -11,7 +11,7 @@ class UserAuthenticationAdmin(UserAdmin):
     list_filter = ('is_admin', 'is_active')
 
     fieldsets = (
-        (None, {'fields': ('username', 'password', )}),
+        (None, {'fields': ('username', 'password', 'verification_OTP')}),
         ('Personal Info', {'fields': ('first_name',
          'last_name', 'email',)}),
         ('Permissions', {'fields': ('is_admin',

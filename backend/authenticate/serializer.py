@@ -9,35 +9,42 @@ class RegisterUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('id','username', "email", "first_name",
-                  "last_name", "password", "password2")
+        fields = ('id', 'username', 'email', 'first_name',
+                  'last_name', 'password', 'password2')
         extra_kwargs = {
-            'password': {"write_only": True},
-            'password2': {"write_only": True},
+            'password': {'write_only': True},
+            'password2': {'write_only': True},
         }
 
-    def save(self):
-        user = User.objects.create_user(
-            username=self.validated_data["username"],
-            email=self.validated_data["email"],
-            first_name=self.validated_data["first_name"],
-            last_name=self.validated_data["last_name"],
-            is_admin=False,
-            is_active=True
+    def save(self, validated_data):
+        validated_data.pop('verification_OTP', None)
 
+        user = User.objects.create_user(
+            username=validated_data['username'],
+            email=validated_data['email'],
+            first_name=validated_data['first_name'],
+            last_name=validated_data['last_name'],
+            is_admin=False,
+            is_active=False
         )
 
-        password = self.validated_data["password"]
-        password2 = self.validated_data["password2"]
+        password = validated_data['password']
+        password2 = validated_data['password2']
 
         if password != password2:
             raise serializers.ValidationError(
-                {"password": "Passwords do not match!"})
+                {'password': 'Passwords do not match!'})
 
         user.set_password(password)
+
+        user.verification_OTP = generate_otp()
         user.save()
 
         return user
+
+
+def generate_otp():
+    return 12345
 
 
 # class RegisterUserSerializer(serializers.ModelSerializer):
@@ -83,4 +90,4 @@ class RegisterUserSerializer(serializers.ModelSerializer):
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id','username', 'email', 'first_name', 'last_name',)
+        fields = ('id', 'username', 'email', 'first_name', 'last_name',)
