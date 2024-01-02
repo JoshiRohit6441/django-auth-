@@ -1,6 +1,6 @@
 from .models import *
 from .serializer import RegisterUserSerializer, UserProfileSerializer
-# LoginUserSerializer
+
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.exceptions import AuthenticationFailed
@@ -11,8 +11,9 @@ from rest_framework import decorators, permissions as rest_permissions
 from rest_framework_simplejwt import tokens
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.conf import settings
+
+
 from django.core.mail import send_mail
-# from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse_lazy
 
 
@@ -63,7 +64,7 @@ class VerifyEmailView(APIView):
 
         if user:
             user.is_active = True
-            user.verification_OTP = True
+            user.verification_OTP = None
             user.save()
             return Response({
                 'message': 'Email verified successfully. You can now log in'
@@ -117,7 +118,6 @@ class LoginViews(APIView):
 
         response.data = {
             'token': tokens,
-            # 'user_id': user.id,
             'message': 'login successful'
         }
         response['X-CSRFToken'] = csrf.get_token(request)
